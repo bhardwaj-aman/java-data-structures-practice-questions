@@ -206,12 +206,13 @@ public class LinkedList {
 		//System.out.println("END");
 	}
 	public void appendLastN(int n) throws Exception {
-		Node x = this.getNodeAt(this.size-n);
-		Node y = this.getNodeAt(this.size-n-1);
+		Node x = this.getNodeAt(this.size-(n%this.size));
+		Node y = this.getNodeAt(this.size-(n%this.size)-1);
 		this.tail.next = this.head;
 	    this.head = x;
 		y.next = null;
 		return;
+		
 }
 public static void main(String[] args) throws Exception {
 		
