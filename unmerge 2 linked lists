@@ -260,6 +260,7 @@ public class LinkedList {
 		}
 		LinkedList l1 = new LinkedList();
 		LinkedList l2 = new LinkedList();
+		//first we merge the 2 linked lists
 		int z = 0;
 		for(int i=0;i<a;i++){
 			if(i==x+1){
@@ -271,20 +272,20 @@ public class LinkedList {
 		for(int i=0;i<=y;i++){
 			l2.addLast(d[i]);
 		}
-		Node n2 = l2.getNodeAt(l2.size-1);
-	//	  System.out.println("n2 is: "+n2.data+ " & z+1 node is: "+l1.getNodeAt(z+1).data);
+		Node n2 = l2.getNodeAt(l2.size-1);	
 		 l2.tail.next=(l1.getNodeAt(z+1));
 		  while(z<l1.size-1){
        z++;
 		l2.size++;
 		  }
-	//	  System.out.print(l2.size);
+	//then we unmerge them by making a new node as null, and making all nodes of l1 point to it
 	Node abc = l1.head;
 	for(int i=0;i<l1.size;i++){
 		Node t = abc.next;
         abc.next = null;
 		abc = t;
 	}
+	//then we traverse through l2, and if a node is encountered whose next is null, thats our node
 	int i=0;
        while(l2.getNodeAt(i).next!=null){
 		   i++;
