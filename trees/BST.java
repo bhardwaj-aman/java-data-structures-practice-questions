@@ -1,6 +1,7 @@
 package trees;
-
+//we create the BST class
 public class BST {
+    //We create nodes, which is a private class
     private class node{
          node leftchild;
          node rightchild;
@@ -9,15 +10,21 @@ public class BST {
     private node root;
     private int size;
     BST(int[] a){
+        //this creates a BST from an array that is already sorted.
         this.root = create(a,0,a.length-1);
     }
+    //we write a recursive function named create, which is used to make the BST node by node, and return the node each time.
+    //we create the min and max pointers, which indicate the starting and end index of our array, and pass these values recursively.
     public node create(int[]a,int min, int max){
+        //base case
         if(min>max){
             return null;
         }
         int mid = (min+max)/2;
+        //we create a new node which has the value in a[mid] as its value .
         node n = new node();
         n.data=a[mid];
+        // we recursively call this function for both halves.
         n.leftchild =create(a,min,mid-1);
         n.rightchild = create(a,mid+1,max);
         return n;
