@@ -1,0 +1,35 @@
+import java.util.*;
+public class Main {
+    public static void main(String args[]) {
+    Scanner s = new Scanner(System.in);
+	int a = s.nextInt();
+	int b = s.nextInt();
+	int[]c = new int[a];
+	for(int i=0;i<a;i++){
+		c[i]=s.nextInt();
+	}
+	for(int i=0;i<b;i++){
+		int max=0;
+		int place=0;
+		for(int j=i;j<c.length;j++){
+			if(c[j]>max&&(j!=i)){
+				max=c[j];
+				place = j;
+			}
+		}
+	//	System.out.println("max is: "+max);
+		for(int j=0;j<c.length;j++){
+			if(c[j]<max){
+				int x=c[j];
+                c[j]=c[place];
+				c[place]=x;
+				break;
+			}
+		}
+
+	}
+	for(int i=0;i<c.length;i++){
+		System.out.print(c[i]+" ");
+	}
+    }
+}
