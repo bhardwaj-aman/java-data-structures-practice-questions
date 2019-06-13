@@ -1,0 +1,183 @@
+package treepractice;
+
+import java.util.*;
+
+public class Print_all_nodes_at_distance_k_from_a_given_node{
+
+    static Scanner scn = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        Print_all_nodes_at_distance_k_from_a_given_node m = new Print_all_nodes_at_distance_k_from_a_given_node();
+        int[] pre = takeInput();
+        int[] in = takeInput1(pre.length);
+
+        int x = scn.nextInt();
+        int[] y = new int[2*x];
+        for(int j=0;j<2*x;j++){
+           y[j] = scn.nextInt();
+        }
+        BinaryTree bt = m.new BinaryTree(pre, in);
+        HashMap<BinaryTree.Node,ArrayList<BinaryTree.Node>> h = new HashMap<BinaryTree.Node,ArrayList<BinaryTree.Node>>();
+        HashMap<BinaryTree.Node,ArrayList<BinaryTree.Node>> set = bt.generateHash(bt.root,null,h);
+        int j=0;
+         while(j<y.length){
+            int c = y[j];
+            int d = y[j+1];
+             BinaryTree.Node w = bt.find(c,bt.root);
+             bt.nodesatdistk(set,w,d);
+             System.out.println("");
+             j=j+2;
+         }
+    //    System.out.println(n.left.data);
+    //    bt.display();
+
+
+        //bt.nodesatdistk(set,bt.root,2);
+    }
+   public static int[] takeInput() {
+        int n = scn.nextInt();
+
+        int[] rv = new int[n];
+        for (int i = 0; i < rv.length; i++) {
+            rv[i] = scn.nextInt();
+        }
+
+        return rv;
+    }
+    public static int[] takeInput1(int n) {
+
+        int[] rv = new int[n];
+        for (int i = 0; i < rv.length; i++) {
+            rv[i] = scn.nextInt();
+        }
+
+        return rv;
+    }
+
+    private class BinaryTree {
+        private class Node {
+            int data;
+            Node left;
+            Node right;
+        }
+
+        private Node root;
+        private int size;
+
+        public BinaryTree(int[] pre, int[] in) {
+            this.root = this.construct(pre, 0, pre.length - 1, in, 0, in.length - 1);
+        }
+
+        private Node construct(int[] pre, int plo, int phi, int[] in, int ilo, int ihi) {
+            if((plo>phi)||(ilo>ihi)){
+                return null;
+            }
+            Node parent = new Node();
+            // System.out.println("plo is: "+plo+" & phi is: "+phi+" ** ilo is: "+ilo+" & ihi is: "+ihi);
+
+            parent.data = pre[plo];
+            int z=0;
+            for(int i=ilo;i<=ihi;i++){
+                if(in[i]==parent.data){
+                    z=i;
+                }
+            }
+            // System.out.println("z is: "+z);
+            parent.left = construct(pre,plo+1,plo+(z-ilo),in,ilo,z-1);
+            parent.right = construct(pre,plo+(z-ilo)+1,phi,in,z+1,ihi);
+            return parent;
+        }
+       public HashMap<Node,ArrayList<Node>> generateHash(Node curr,Node parent,HashMap<Node,ArrayList<Node>> h){
+            if (curr==null){
+                return null;
+            }
+           h.put(curr,new ArrayList<Node>());
+            if (parent!=null)
+            h.get(curr).add(parent);
+            if (curr.left!=null)
+            h.get(curr).add(curr.left);
+            if (curr.right!=null)
+            h.get(curr).add(curr.right);
+           HashMap<Node,ArrayList<Node>> lft = generateHash(curr.left,curr,h);
+           HashMap<Node,ArrayList<Node>> rt = generateHash(curr.right,curr,h);
+
+            return h;
+
+       }
+        public void nodesatdistk(HashMap<Node,ArrayList<Node>> h,Node parent,int limit){
+            Queue<Node> q = new LinkedList<>();
+            q.add(parent);
+            ArrayList<Node> visited = new ArrayList<>();
+            int k=0;
+            while (!q.isEmpty()){
+                if(k==limit){
+                    while (!q.isEmpty()){
+                        System.out.print(q.remove().data+" ");
+                    }
+                }
+             int size  = q.size();
+             for(int i=0;i<size;i++){
+                 Node nn = q.remove();
+                 visited.add(nn);
+                 for(Node x:h.get(nn)){
+                     if((!visited.contains(x))) {
+                         //System.out.println("adding: "+x.data);
+                         q.add(x);
+                         visited.add(x);
+                     }
+                 }
+             }
+             k++;
+            }
+        }
+
+        public void display() {
+            this.display(this.root);
+        }
+       public Node find(int n,Node parent){
+            if(parent==null){
+                return null;
+            }
+            if (parent.data==n){
+                return parent;
+            }
+            Node l = (find(n,parent.left));
+            Node r = find(n,parent.right);
+            if (l!=null){
+                return l;
+            }else if (r!=null){
+                return r;
+            }
+            return null;
+       }
+        private void display(Node node) {
+            if (node == null) {
+                return;
+            }
+
+            String str = "";
+
+            if (node.left != null) {
+                str += node.left.data;
+            } else {
+                str += "END";
+            }
+
+            str += " => " + node.data + " <= ";
+
+            if (node.right != null) {
+                str += node.right.data;
+            } else {
+                str += "END";
+            }
+
+            System.out.println(str);
+
+            this.display(node.left);
+            this.display(node.right);
+        }
+
+    }
+
+}
+//Print_all_nodes_at_distance_k_from_a_given_node
