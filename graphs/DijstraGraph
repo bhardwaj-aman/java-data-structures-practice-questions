@@ -1,0 +1,406 @@
+package GraphPractice;
+import  java.util.*;
+
+public class Graph {
+   static Scanner s = new Scanner(System.in);
+    private class vertex{
+        HashMap<String ,Integer> neighbours;
+        vertex(){
+            neighbours = new  HashMap<String ,Integer>();
+        }
+    }
+    HashMap<String,vertex> vertices;
+    Graph(){
+        vertices = new HashMap<String, vertex>();
+    }
+    public int numvertex(){
+        return vertices.size();
+    }
+    public boolean containsvertex(String a){
+        for(String x:vertices.keySet()){
+            if(x.equals(a)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public void removeVertex(String a){
+        vertex v = vertices.get(a);
+        for(String x:v.neighbours.keySet()){
+            vertices.get(x).neighbours.remove(a);
+        }
+        vertices.remove(a);
+    }
+    public void addvertex(String a){
+        vertex v = new vertex();
+        vertices.put(a,v);
+    }
+    public int numedges(){
+        int counter=0;
+        for(String x:vertices.keySet()){
+            counter+=vertices.get(x).neighbours.size();
+        }
+        return counter/2;
+    }
+    public void display(){
+        System.out.println("-----------");
+        for(String x: vertices.keySet()){
+            System.out.print(x+" : ");
+            System.out.println(vertices.get(x).neighbours);
+        }
+        System.out.println("------------");
+    }
+    public void addedge(String a, String b,int i){
+        vertex v1 = vertices.get(a);
+        vertex v2 = vertices.get(b);
+        if(v1==null||v2==null||v1.neighbours.containsKey(v2)){
+            return;
+        }
+        v1.neighbours.put(b,i);
+        v2.neighbours.put(a,i);
+    }
+    public void removeedge(String a , String b){
+        vertex v1 = vertices.get(a);
+        vertex v2 = vertices.get(b);
+        if(v1==null||v2==null){
+            return;
+        }
+        v1.neighbours.remove(b);
+        v2.neighbours.remove(a);
+    }
+    public boolean containsedge(String a,String b){
+        for(String x:vertices.keySet()){
+            if(x.equals(a)){
+                if(vertices.get(x).neighbours.containsKey(b)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public boolean haspath(String a, String b,ArrayList<String > visited){
+        visited.add(a);
+        if(this.containsedge(a,b)){
+            return true;
+        }
+
+        for(String x:vertices.get(a).neighbours.keySet()){
+            if((!visited.contains(x))){
+                return haspath(x,b,visited);
+            }
+        }
+        return false;
+    }
+    private class pair{
+        String a;
+        String path;
+    }
+
+    public boolean  isconnected(){
+        LinkedList<pair> queue = new LinkedList<>();
+        ArrayList<String> visited = new ArrayList<>();
+        int counter=0;
+        for(String x1:vertices.keySet()) {
+            if(visited.contains(x1)){
+                continue;
+            }
+            counter++;
+            pair p = new pair();
+            p.a = x1;
+            p.path = x1;
+            queue.addLast(p);
+            while (!queue.isEmpty()) {
+                pair x = queue.removeFirst();
+                if (visited.contains(x.a)) {
+                    continue;
+                }
+                //  System.out.print( x.a+" ->");
+
+                visited.add(x.a);
+                for (String str : vertices.get(x.a).neighbours.keySet()) {
+                    if (!visited.contains(str)) {
+                        pair p1 = new pair();
+                        p1.a = str;
+                        p1.path = x.path + str;
+                        //  System.out.println("added : " + p1.a);
+                        queue.addLast(p1);
+                    }
+                }
+            }
+        }
+        if(counter>1){
+            System.out.println("counter is: "+counter);
+            return false;
+        }
+        return true;
+    }
+    public void  allconnectedpaths(){
+        LinkedList<pair> queue = new LinkedList<>();
+        ArrayList<String> visited = new ArrayList<>();
+
+        for(String x1:vertices.keySet()) {
+            if(visited.contains(x1)){
+                continue;
+            }
+            ArrayList<String> current = new ArrayList<>();
+            pair p = new pair();
+            p.a = x1;
+            p.path = x1;
+            queue.addLast(p);
+            while (!queue.isEmpty()) {
+                pair x = queue.removeFirst();
+                //  System.out.print( x.a+" ->");
+                if(visited.contains(x.a)){
+                    continue;
+                }
+                visited.add(x.a);
+                current.add(x.a);
+                for (String str : vertices.get(x.a).neighbours.keySet()) {
+                    if (!visited.contains(str)) {
+                        pair p1 = new pair();
+                        p1.a = str;
+                        queue.addLast(p1);
+                    }
+                }
+            }
+            System.out.println(current);
+        }
+
+    }
+    public boolean iscyclic(){
+        LinkedList<pair> queue = new LinkedList<>();
+        ArrayList<String> visited = new ArrayList<>();
+        for(String x1:vertices.keySet()) {
+            if (visited.contains(x1)) {
+                continue;
+            }
+            pair p = new pair();
+            p.a = x1;
+            p.path = x1;
+            queue.addLast(p);
+            while (!queue.isEmpty()) {
+                pair x = queue.removeFirst();
+                if (visited.contains(x.a)) {
+                    System.out.println(visited+" contains "+x.a);
+                    return true;
+                }
+
+                visited.add(x.a);
+                for (String str : vertices.get(x.a).neighbours.keySet()) {
+                    if (!visited.contains(str)) {
+                        pair p1 = new pair();
+                        p1.a = str;
+                        p1.path = x.path + str;
+                        queue.addLast(p1);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean istree(){
+        if(!this.iscyclic()&&this.isconnected()){
+            return true;
+        }
+        return false;
+    }
+    private class primspair implements Comparable<primspair>{
+        String vname;
+        String acqname;
+        int cost;
+        public int compareTo(primspair p2){
+            return this.cost-p2.cost;
+        }
+    }
+    private class bfspair{
+        String vname;
+        String acqname;
+        int d;
+
+    }
+    public int bfs(String start,String end){
+        LinkedList<bfspair> queue = new LinkedList<>();
+        HashMap<String,Boolean> visited = new HashMap<>();
+        bfspair p = new bfspair();
+        p.vname=start;
+        p.acqname=null;
+        p.d=0;
+        queue.addLast(p);
+        for(String str:vertices.keySet()){
+            visited.put(str,false);
+        }
+        while (!queue.isEmpty()){
+            bfspair x = queue.removeFirst();
+            visited.put(x.vname,true);
+            if(x.vname.equals(end)){
+                return x.d;
+            }
+            for(String str:vertices.get(x.vname).neighbours.keySet()){
+                if(visited.get(str)==false){
+                    bfspair b1 = new bfspair();
+                    b1.vname=str;
+                    b1.acqname = x.vname;
+                    b1.d=x.d+1;
+                    queue.addLast(b1);
+                }
+            }
+        }
+        return -1;
+    }
+    private class dijstrapair implements Comparable<dijstrapair>{
+        String vname;
+        String acqname;
+        int distance;
+
+        @Override
+        public int compareTo(dijstrapair o) {
+            return this.distance-o.distance;
+        }
+    }
+    public int dijstra(String start,String end){
+       HashMap<String,dijstrapair> visited = new HashMap<>();
+       Heap<dijstrapair> heap = new Heap<>();
+       HashMap<String,dijstrapair> ans = new HashMap<>();
+       for(String x:vertices.keySet()){
+           dijstrapair d = new dijstrapair();
+           d.vname=x;
+           if(x.equals(start)){
+            d.distance=0;
+            d.acqname=null;
+           }else {
+               d.distance = Integer.MAX_VALUE;
+               d.acqname = "";
+           }
+           visited.put(x,d);
+           heap.add(d);
+       }
+       while (!heap.isEmpty()){
+           dijstrapair d1=heap.delete();
+           ans.put(d1.vname,d1);
+           visited.remove(d1.vname);
+           for(String d:vertices.get(d1.vname).neighbours.keySet()){
+               if(visited.containsKey(d)) {
+                   int od = visited.get(d).distance;
+                   int nd = d1.distance + vertices.get(d1.vname).neighbours.get(d);
+                   if (od > nd) {
+                       visited.get(d).distance = nd;
+                       visited.get(d).acqname = d1.vname;
+                       heap.updatePriority(visited.get(d));
+                   }
+               }
+           }
+       }
+       return ans.get(end).distance;
+    }
+
+    public static ArrayList<Integer> customTestCase2(){
+        ArrayList<Integer> ans = new ArrayList<>();
+        int b = s.nextInt();
+        int k = s.nextInt();
+        Graph g = new Graph();
+        for (int j = 1; j <= b; j++) {
+            g.addvertex(j + "");
+        }
+        for (int z = 0; z < k; z++) {
+            int x = s.nextInt();
+            int y = s.nextInt();
+            int p = s.nextInt();
+            g.addedge(x + "", y + "", p);
+            //System.out.println(" adding edge between : "+x+" & "+y);
+        }
+        int l = s.nextInt();
+        //   System.out.println("b is: " + b + " k is: " + k + "" + " & l is: " + l);
+        for (int c=1;c<=b;c++) {
+            if (c!=l) {
+                //  System.out.print(g.bfs(l+"",c)+"");
+                String y=l+"";
+                ans.add(g.dijstra(y,c+""));
+            }
+        }
+        return ans;
+    }
+    public static void main(String[] args) {
+
+        int a = s.nextInt();
+        for(int i=0;i<a;i++){
+        ArrayList<Integer> ans = customTestCase2();
+        for (int x:ans) {
+            System.out.print(x+" ");
+        }
+        System.out.println("");
+        }
+        }
+        }
+
+ class Heap<T extends Comparable<T>> {
+    HashMap<T,Integer> indices = new HashMap<>();
+    private ArrayList<T> data;
+    Heap(){
+        data = new ArrayList<T>();
+    }
+    public void add(T i){
+        data.add(i);
+        int x= data.size()-1;
+        indices.put(i,x);
+        upheapify(x);
+    }
+    public boolean isEmpty(){
+        return data.isEmpty();
+    }
+    public void swap(int i,int j){
+        T v1= data.get(i);
+        T v2 = data.get(j);
+        data.set(i,v2);
+        data.set(j,v1);
+        indices.put(v1,j);
+        indices.put(v2,i);
+    }
+    public T delete(){
+        swap(0,data.size()-1);
+        T n= data.remove(data.size()-1);
+        downhealpify(0);
+        indices.remove(n);
+        return n;
+    }
+    public void downhealpify(int i){
+        int v1=(2*i)+1;
+        int v2 = v1+1;
+        if(v2>=data.size()){
+            return;
+        }
+        if(data.get(i).compareTo(data.get(v1))>0||(data.get(i).compareTo(data.get(v2))>0)){
+            if(data.get(v2).compareTo(data.get(v1))<0){
+                swap(i,v2);
+                downhealpify(v2);
+            }else {
+                swap(i,v1);
+                downhealpify(v1);
+            }
+        }
+    }
+    public void upheapify(int x){
+        int p= (x-1)/2;
+        if(p<0){
+            return;
+        }
+        if(isGreater(data.get(p),data.get(x))>0){
+            T temp = data.get(p);
+            data.set(p,data.get(x));
+            data.set(x,temp);
+            upheapify(p);
+        }else {
+            return;
+        }
+    }
+    public void display(){
+        System.out.println(data);
+    }
+    public int isGreater(T i,T j){
+        return i.compareTo(j);
+    }
+    public void updatePriority(T i){
+        int a = indices.get(i);
+        upheapify(a);
+    }
+}
