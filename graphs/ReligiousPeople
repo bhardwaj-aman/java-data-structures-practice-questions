@@ -1,0 +1,270 @@
+package GraphPractice;
+import  java.util.*;
+
+public class Graph {
+   static Scanner s = new Scanner(System.in);
+    private class vertex{
+        HashMap<String ,Integer> neighbours;
+        Boolean mandir_Wahi_Banega;
+        vertex(){
+            neighbours = new  HashMap<String ,Integer>();
+            mandir_Wahi_Banega=false;
+        }
+    }
+    HashMap<String,vertex> vertices;
+    Graph(){
+        vertices = new HashMap<String, vertex>();
+    }
+    public int numvertex(){
+        return vertices.size();
+    }
+    public boolean containsvertex(String a){
+        for(String x:vertices.keySet()){
+            if(x.equals(a)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public void removeVertex(String a){
+        vertex v = vertices.get(a);
+        for(String x:v.neighbours.keySet()){
+            vertices.get(x).neighbours.remove(a);
+        }
+        vertices.remove(a);
+    }
+    public void addvertex(String a){
+        vertex v = new vertex();
+        vertices.put(a,v);
+    }
+    public int numedges(){
+        int counter=0;
+        for(String x:vertices.keySet()){
+            counter+=vertices.get(x).neighbours.size();
+        }
+        return counter/2;
+    }
+    public void display(){
+        System.out.println("-----------");
+        for(String x: vertices.keySet()){
+            System.out.print(x+" : ");
+            System.out.println(vertices.get(x).neighbours);
+        }
+        System.out.println("------------");
+    }
+    public void addedge(String a, String b,int i){
+        vertex v1 = vertices.get(a);
+        vertex v2 = vertices.get(b);
+        if(v1==null||v2==null||v1.neighbours.containsKey(v2)){
+            return;
+        }
+        v1.neighbours.put(b,i);
+        v2.neighbours.put(a,i);
+    }
+    public void removeedge(String a , String b){
+        vertex v1 = vertices.get(a);
+        vertex v2 = vertices.get(b);
+        if(v1==null||v2==null){
+            return;
+        }
+        v1.neighbours.remove(b);
+        v2.neighbours.remove(a);
+    }
+    public boolean containsedge(String a,String b){
+        for(String x:vertices.keySet()){
+            if(x.equals(a)){
+                if(vertices.get(x).neighbours.containsKey(b)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public boolean haspath(String a, String b,ArrayList<String > visited){
+        visited.add(a);
+        if(this.containsedge(a,b)){
+            return true;
+        }
+
+        for(String x:vertices.get(a).neighbours.keySet()){
+            if((!visited.contains(x))){
+                return haspath(x,b,visited);
+            }
+        }
+        return false;
+    }
+    private class pair{
+        String a;
+        String path;
+    }
+
+
+    public void  allconnectedpaths(){
+        LinkedList<pair> queue = new LinkedList<>();
+        ArrayList<String> visited = new ArrayList<>();
+
+        for(String x1:vertices.keySet()) {
+            if(visited.contains(x1)){
+                continue;
+            }
+            ArrayList<String> current = new ArrayList<>();
+            pair p = new pair();
+            p.a = x1;
+            p.path = x1;
+            queue.addLast(p);
+            while (!queue.isEmpty()) {
+                pair x = queue.removeFirst();
+                //  System.out.print( x.a+" ->");
+                if(visited.contains(x.a)){
+                    continue;
+                }
+                visited.add(x.a);
+                current.add(x.a);
+                for (String str : vertices.get(x.a).neighbours.keySet()) {
+                    if (!visited.contains(str)) {
+                        pair p1 = new pair();
+                        p1.a = str;
+                        queue.addLast(p1);
+                    }
+                }
+            }
+           // System.out.println(current);
+            String max=max_Connected_Vertex(current);
+            vertices.get(max).mandir_Wahi_Banega=true;
+       //     System.out.println(" mandir created at: "+max);
+        }
+
+    }
+    public boolean iscyclic(){
+        LinkedList<pair> queue = new LinkedList<>();
+        ArrayList<String> visited = new ArrayList<>();
+        for(String x1:vertices.keySet()) {
+            if (visited.contains(x1)) {
+                continue;
+            }
+            pair p = new pair();
+            p.a = x1;
+            p.path = x1;
+            queue.addLast(p);
+            while (!queue.isEmpty()) {
+                pair x = queue.removeFirst();
+                if (visited.contains(x.a)) {
+                    System.out.println(visited+" contains "+x.a);
+                    return true;
+                }
+
+                visited.add(x.a);
+                for (String str : vertices.get(x.a).neighbours.keySet()) {
+                    if (!visited.contains(str)) {
+                        pair p1 = new pair();
+                        p1.a = str;
+                        p1.path = x.path + str;
+                        queue.addLast(p1);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    public String max_Connected_Vertex(ArrayList<String> current){
+        int mc=0;
+        String v="";
+        for(String x:current){
+            if(vertices.get(x).neighbours.size()>mc){
+                mc=vertices.get(x).neighbours.size();
+                v=x;
+            }
+        }
+        return v;
+    }
+    private class bfspair{
+        String vname;
+        String acqname;
+        int d;
+
+    }
+        public int bfs(String start){
+        allconnectedpaths();
+        LinkedList<bfspair> queue = new LinkedList<>();
+        HashMap<String,Boolean> visited = new HashMap<>();
+        bfspair p = new bfspair();
+        p.vname=start;
+        p.acqname=null;
+        p.d=0;
+        queue.addLast(p);
+
+        for(String str:vertices.keySet()){
+            visited.put(str,false);
+        }
+
+        while (!queue.isEmpty()){
+            bfspair x = queue.removeFirst();
+            visited.put(x.vname,true);
+            if(vertices.get(x.vname).mandir_Wahi_Banega==true){
+                return x.d;
+            }
+            for(String str:vertices.get(x.vname).neighbours.keySet()){
+                if(visited.get(str)==false){
+                    bfspair b1 = new bfspair();
+                    b1.vname=str;
+                    b1.acqname = x.vname;
+                    b1.d=x.d+1;
+                    queue.addLast(b1);
+                }
+            }
+        }
+        return -1;
+    }
+    public int mandir(String x,int a,int b){
+        int cost=0;
+
+                if(b*bfs(x)<=a){
+                    cost=b*bfs(x);
+            }else{
+                    cost=a;
+                }
+        return cost;
+    }
+    public int mandir_Solution(int a,int b){
+        int cost=0;
+
+      //  System.out.println("initial cost is: "+cost);
+        for(String x:vertices.keySet()){
+          //  System.out.println(" cost "+mandir(x,a,b)+" added for: "+x);
+            cost+=mandir(x,a,b);
+        }
+        for(String x:vertices.keySet()){
+            if(vertices.get(x).mandir_Wahi_Banega==true){
+                cost+=a;
+            }
+        }
+        return cost;
+    }
+    public static int customsolution(){
+        int cities=s.nextInt();
+        int roads = s.nextInt();
+        int a = s.nextInt();
+        int b=s.nextInt();
+        Graph g = new Graph();
+        for(int i=1;i<=cities;i++){
+            g.addvertex(i+"");
+        }
+        for(int i=0;i<roads;i++){
+            int c1=s.nextInt();
+            int c2=s.nextInt();
+            g.addedge(c1+"",c2+"",1);
+        }
+        int solution = g.mandir_Solution(a,b);
+        return solution;
+    }
+
+    public static void main(String[] args) {
+
+        int a = s.nextInt();
+        for(int i=0;i<a;i++){
+            System.out.println(customsolution());
+        }
+        }
+        }
