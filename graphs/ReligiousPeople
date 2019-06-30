@@ -8,7 +8,7 @@ public class Graph {
         Boolean mandir_Wahi_Banega;
         vertex(){
             neighbours = new  HashMap<String ,Integer>();
-            mandir_Wahi_Banega=false;
+            mandir_Banega=false;
         }
     }
     HashMap<String,vertex> vertices;
@@ -236,7 +236,7 @@ public class Graph {
             cost+=mandir(x,a,b);
         }
         for(String x:vertices.keySet()){
-            if(vertices.get(x).mandir_Wahi_Banega==true){
+            if(vertices.get(x).mandir_Banega==true){
                 cost+=a;
             }
         }
