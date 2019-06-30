@@ -5,7 +5,7 @@ public class Graph {
    static Scanner s = new Scanner(System.in);
     private class vertex{
         HashMap<String ,Integer> neighbours;
-        Boolean mandir_Wahi_Banega;
+        Boolean mandir_Banega;
         vertex(){
             neighbours = new  HashMap<String ,Integer>();
             mandir_Banega=false;
@@ -130,7 +130,7 @@ public class Graph {
             }
            // System.out.println(current);
             String max=max_Connected_Vertex(current);
-            vertices.get(max).mandir_Wahi_Banega=true;
+            vertices.get(max).mandir_Banega=true;
        //     System.out.println(" mandir created at: "+max);
         }
 
@@ -202,7 +202,7 @@ public class Graph {
         while (!queue.isEmpty()){
             bfspair x = queue.removeFirst();
             visited.put(x.vname,true);
-            if(vertices.get(x.vname).mandir_Wahi_Banega==true){
+            if(vertices.get(x.vname).mandir_Banega==true){
                 return x.d;
             }
             for(String str:vertices.get(x.vname).neighbours.keySet()){
@@ -267,4 +267,4 @@ public class Graph {
             System.out.println(customsolution());
         }
         }
-        }
+}
