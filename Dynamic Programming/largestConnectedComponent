@@ -1,0 +1,222 @@
+package DP;
+import java.util.*;
+public class largestCC {
+
+    public static void main(String[] args) {
+        int [][] a = { { 1, 4, 4, 4, 4, 3, 3, 1 },
+
+                { 2, 1, 1, 4, 3, 3, 1, 1 },
+
+                { 3, 2, 1, 1, 2, 3, 2, 1 },
+
+                { 3, 3, 2, 1, 2, 2, 2, 2 },
+
+                { 3, 1, 3, 1, 1, 4, 4, 4 },
+
+                { 1, 1, 3, 1, 1, 4, 4, 4 } };
+
+        int [][] b = fin(a);
+        for(int i=0;i<b.length;i++){
+            for(int j=0;j<b[0].length;j++){
+                System.out.print(b[i][j]+" ");
+            }
+            System.out.println("");
+        }
+
+    }
+    private static class pair{
+        int cc;
+        int r;
+        int b;
+        int g;
+        int y;
+        pair(){
+            r=b=g=y=0;
+        }
+    }
+    public static int longestCC(int[][] a){
+        pair[][] ans = new pair[a.length][a.length];
+        int[][]ans2= new int[a.length][a.length];
+        int[][]ans3=new int[a.length][a.length];
+        int x=0;
+        int y=0;
+        int c=0;
+        for(int i=0;i<a.length;i++){
+            for(int j=0;j<a.length;j++){
+                ans[i][j]= new pair();
+            }
+        }
+        for(int i=0;i<a.length;i++){
+            if(a[i][0]==1){
+                ans[i][0].r++;
+            }
+            if(a[i][0]==2){
+                ans[i][0].b++;
+            }
+            if(a[i][0]==3){
+                ans[i][0].g++;
+            }
+            if(a[i][0]==4){
+                ans[i][0].y++;
+            }
+        }
+
+        for(int i=0;i<a.length;i++){
+            if(a[0][i]==1){
+                ans[0][i].r++;
+            }
+            if(a[0][i]==2){
+                ans[0][i].b++;
+            }
+            if(a[0][i]==3){
+                ans[0][i].g++;
+            }
+            if(a[0][i]==4){
+                ans[0][i].y++;
+            }
+        }
+        int max=0;
+        for(int i=1;i<a.length;i++){
+            for(int j=1;j<a.length;j++){
+                if(a[i][j]==1){
+                    ans[i][j].r=Math.max(ans[i-1][j].r,ans[i][j-1].r)+1;
+                    if(ans[i][j].r>max){
+                        max=ans[i][j].r;
+                        x=i;
+                        y=j;
+                        c=1;
+                    }
+                }
+                if(a[i][j]==2){
+                    ans[i][j].b=Math.max(ans[i-1][j].b,ans[i][j-1].b)+1;
+                    if(ans[i][j].b>max){
+                        max=ans[i][j].b;
+                        x=i;
+                        y=j;
+                        c=2;
+                    }
+                }
+                if(a[i][j]==3){
+                    ans[i][j].g=Math.max(ans[i-1][j].g,ans[i][j-1].g)+1;
+                    if(ans[i][j].g>max){
+                        max=ans[i][j].g;
+                        x=i;
+                        y=j;
+                        c=3;
+                    }
+                }
+                if(a[i][j]==1){
+                    ans[i][j].y=Math.max(ans[i-1][j].y,ans[i][j-1].y)+1;
+                    if(ans[i][j].y>max){
+                        max=ans[i][j].y;
+                        x=i;
+                        y=j;
+                        c=4;
+                    }
+                }
+                while(a[x-1][y]==c||a[x][y-1]==c){
+                    if(a[x-1][y]==c&&a[x][y-1]==c){
+                        ans2[x-1][y]=c;
+                        ans2[x][y-1]=c;
+
+                    }
+                }
+            }
+        }
+        return max;
+    }
+    public static int[][] fin(int[][] a){
+        int[][] ans =new int[a.length][a[0].length];
+        for(int i=0;i<a.length;i++){
+            for(int j=0;j<a[0].length;j++){
+                ans[i][j]=bfs(a,a[i][j],i,j,0);
+            }
+        }
+        return ans;
+    }
+    private static class pair2{
+        int i;
+        int j;
+        pair2(){
+            i=j=0;
+        }
+        pair2(int x,int y){
+            this.i=x;
+            this.j=y;
+        }
+
+    }
+    public static int bfs(int[][]a,int s,int i,int j,int max){
+       boolean[][] visited = new boolean[a.length][a[0].length];
+       Queue<pair2> q = new LinkedList<>();
+       pair2 p = new pair2(i,j);
+       q.add(p);
+       while (!q.isEmpty()){
+           pair2 x = q.remove();
+           if(visited[x.i][x.j]){
+               continue;
+           }
+           System.out.println(" ********x is: "+x.i+" y is: "+x.j);
+           max++;
+           visited[x.i][x.j]=true;
+           if((x.i+1<a.length)&&(!visited[x.i+1][x.j])&&a[x.i+1][x.j]==s){
+               pair2 y = new pair2(x.i+1,x.j);
+               q.add(y);
+                   System.out.println(" added i: "+y.i+" j is: "+y.j);
+           }
+           if((x.j+1<a[0].length)&&(!visited[x.i][x.j+1])&&a[x.i][x.j+1]==s){
+               pair2 y = new pair2(x.i,x.j+1);
+               q.add(y);
+                   System.out.println(" added i: "+y.i+" j is: "+y.j);
+           }
+           if((x.i-1>=0)&&(!visited[x.i-1][x.j])&&a[x.i-1][x.j]==s){
+               pair2 y = new pair2(x.i-1,x.j);
+                  q.add(y);
+                   System.out.println(" added i: "+y.i+" j is: "+y.j);
+           }
+           if((x.j-1>=0)&&(!visited[x.i][x.j-1])&&a[x.i][x.j-1]==s){
+               pair2 y = new pair2(x.i,x.j-1);
+            q.add(y);
+                   System.out.println(" added i: "+y.i+" j is: "+y.j);
+           }
+       }
+       return max;
+    }
+    public static int bfs2(int[][]a,int s,int i,int j,int max){
+        pair2 p = new pair2();
+        ArrayList<pair2> visited = new ArrayList<>();
+        p.i=i;
+        p.j=j;
+        Queue<pair2>q = new LinkedList<>();
+        q.add(p);
+        while(!q.isEmpty()){
+            pair2 x= q.remove();
+            if(x.i==4&&x.j==5)
+            System.out.println("************** x is: "+x.i+" y is: "+x.j);
+            if(visited.contains(x)){
+                continue;
+            }
+            visited.add(x);
+            max++;
+           // System.out.println(" max becomes: "+max);
+            if(((x.i+1)<a.length)&&a[x.i+1][x.j]==s){
+                pair2 y= new pair2();
+                y.i=x.i+1;
+                y.j=x.j;
+                q.add(y);
+              //  System.out.println(" added i: "+y.i+" j is: "+y.j);
+
+            }
+            if(((x.j+1)<a[0].length)&&a[x.i][x.j+1]==s){
+
+                pair2 y= new pair2();
+                y.i=x.i;
+                y.j=x.j+1;
+                q.add(y);
+           //     System.out.println(" added i: "+y.i+" j is: "+y.j);
+            }
+        }
+        return max;
+    }
+}
+
